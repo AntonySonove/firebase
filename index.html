@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulaire Firebase</title>
+</head>
+<body>
+    <main style="display: flex; gap: 25px;">
+        <div style="display: flex; flex-direction: column; gap: 25px;">
+            <form action="" id="form" style="display: flex; flex-direction: column; max-width: 250px; gap: 5px;">
+                <h2>Inscription</h2>
+                <input type="text" id="nickname" placeholder="Pseudo" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Mot de passe" required>
+                <input type="submit" value="Envoyer">
+            </form>
+    
+            <form action="" id="character" style="display: flex; flex-direction: column; max-width: 250px; gap: 5px;">
+                <h2>Créer un personnage</h2>
+                <input type="text" id="name" placeholder="Nom du personnage" required>
+                <input type="number" id="lp" placeholder="Vie">
+                <input type="number" id="mp" placeholder="Magie">
+                <input type="number" id="atk" placeholder="Attaque">
+                <input type="number" id="def" placeholder="Defense">
+                <input type="number" id="atkm" placeholder="Att.Magique">
+                <input type="number" id="defm" placeholder="Def.Magique">
+                <input type="number" id="speed" placeholder="Vitesse">
+                <input type="submit" id="create" value="Créer">
+            </form>
+            
+        </div>
+
+        <section>
+            <h2>Liste des personnages</h2>
+            <ul id="characterList">
+                <li></li>
+            </ul>
+        </section>
+
+
+    </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
+    import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAARQRlfL5UB-2dtOmGCNwghQUNjVBzht4",
+      authDomain: "epic-jdr.firebaseapp.com",
+      databaseURL: "https://epic-jdr-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "epic-jdr",
+      storageBucket: "epic-jdr.appspot.com",
+      messagingSenderId: "774440700806",
+      appId: "1:774440700806:web:20b394b65dc4d7e128ba07",
+      measurementId: "G-G0K6378XE6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+
+    // Créer un utilisateur
+    document.getElementById("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const nickname = document.getElementById("nickname").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const idUser = userCredential.user.uid;
+
+        set(ref(database, 'users/' + idUser), {
+            nickname: nickname,
+            email: email,
+        })
+  
+        alert("Utilisateur ajouté!");
+        document.getElementById("form").reset();
+        })
+        .catch((error) => {
+            alert("Erreur : " + error.message);
+        });
+    });
+
+
+    // Créer un personnagege
+
+    document.getElementById("character").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name= document.getElementById("name").value;
+      const lp= document.getElementById("lp").value;
+      const mp= document.getElementById("mp").value;
+      const atk= document.getElementById("atk").value;
+      const def= document.getElementById("def").value;
+      const atkm= document.getElementById("atkm").value;
+      const defm= document.getElementById("defm").value;
+      const speed= document.getElementById("speed").value;
+
+    
+    const characterRef = ref(database, 'character/'); 
+    push(characterRef,{
+        name: name,
+        lp: lp,
+        mp: mp,
+        atk: atk,
+        def: def,
+        atkm: atkm,
+        defm: defm,
+        speed: speed,
+    })
+
+    .then(()=>{
+            alert("Personnage enregistré!");
+            document.getElementById("character").reset();
+        })
+    .catch((error) => {
+            alert("Erreur : " + error.message);
+        });
+    });
+    
+    // Afficher la liste des personnages
+
+    // Référence vers la liste dans la base
+    const characterList = ref(database, 'character/');
+
+    // Fonction de lecture en temps réel
+onValue(characterList, (snapshot) => {
+    const list = document.getElementById("characterList");
+    list.innerHTML = ""; // Réinitialiser la liste
+
+    const data = snapshot.val();
+    console.log(data);
+    if (data) {
+    Object.entries(data).forEach(([key, character]) => {
+        const li = document.createElement("li");
+        list.appendChild(li);
+        const ul = document.createElement("ul");
+        li.appendChild(ul);
+        const liName = document.createElement("li");
+        const h6 = document.createElement("h3");
+        h6.textContent = `${character.name}`
+        liName.appendChild(h6);
+        ul.appendChild(liName);
+        const liLp = document.createElement("li");
+        liLp.textContent = `Points de vie : ${character.lp}`;
+        ul.appendChild(liLp);
+        const liMp = document.createElement("li");
+        liMp.textContent = `Points de magie : ${character.mp}`;
+        ul.appendChild(liMp);
+        const liAtk = document.createElement("li");
+        liAtk.textContent = `Attaque : ${character.atk}`;
+        ul.appendChild(liAtk);
+        const liDef = document.createElement("li");
+        liDef.textContent = `Défense : ${character.def}`;
+        ul.appendChild(liDef);
+        const liAtkm = document.createElement("li");
+        liAtkm.textContent = `Attaque magique : ${character.atkm}`;
+        ul.appendChild(liAtkm);
+        const liDefm = document.createElement("li");
+        liDefm.textContent = `Défense magique : ${character.defm}`;
+        ul.appendChild(liDefm);
+        const liSpeed = document.createElement("li");
+        liSpeed.textContent = `Vitesse : ${character.speed}`;
+        ul.appendChild(liSpeed);
+    });
+  } else {
+        const li = document.createElement("li");
+        li.textContent = `Aucun personnage enregistré.`
+        list.appendChild(li);
+  }
+});
+
+  </script>
+</body>
+</html>
