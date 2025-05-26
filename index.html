@@ -105,7 +105,6 @@
       const defm= document.getElementById("defm").value;
       const speed= document.getElementById("speed").value;
 
-    
     const characterRef = ref(database, 'character/'); 
     push(characterRef,{
         name: name,
@@ -132,53 +131,62 @@
     // Référence vers la liste dans la base
     const characterList = ref(database, 'character/');
 
-    // Fonction de lecture en temps réel
-onValue(characterList, (snapshot) => {
-    const list = document.getElementById("characterList");
-    list.innerHTML = ""; // Réinitialiser la liste
+        // Fonction de lecture en temps réel
+    onValue(characterList, (snapshot) => {
+        const list = document.getElementById("characterList");
+        list.innerHTML = ""; // Réinitialiser la liste
 
-    const data = snapshot.val();
-    console.log(data);
-    if (data) {
-    Object.entries(data).forEach(([key, character]) => {
-        const li = document.createElement("li");
-        list.appendChild(li);
-        const ul = document.createElement("ul");
-        li.appendChild(ul);
-        const liName = document.createElement("li");
-        const h6 = document.createElement("h3");
-        h6.textContent = `${character.name}`
-        liName.appendChild(h6);
-        ul.appendChild(liName);
-        const liLp = document.createElement("li");
-        liLp.textContent = `Points de vie : ${character.lp}`;
-        ul.appendChild(liLp);
-        const liMp = document.createElement("li");
-        liMp.textContent = `Points de magie : ${character.mp}`;
-        ul.appendChild(liMp);
-        const liAtk = document.createElement("li");
-        liAtk.textContent = `Attaque : ${character.atk}`;
-        ul.appendChild(liAtk);
-        const liDef = document.createElement("li");
-        liDef.textContent = `Défense : ${character.def}`;
-        ul.appendChild(liDef);
-        const liAtkm = document.createElement("li");
-        liAtkm.textContent = `Attaque magique : ${character.atkm}`;
-        ul.appendChild(liAtkm);
-        const liDefm = document.createElement("li");
-        liDefm.textContent = `Défense magique : ${character.defm}`;
-        ul.appendChild(liDefm);
-        const liSpeed = document.createElement("li");
-        liSpeed.textContent = `Vitesse : ${character.speed}`;
-        ul.appendChild(liSpeed);
+        const data = snapshot.val();
+
+        if (data) {
+        Object.entries(data).forEach(([key, character]) => {
+
+            const li = document.createElement("li");
+            list.appendChild(li);
+            const ul = document.createElement("ul");
+            li.appendChild(ul);
+
+            const liName = document.createElement("li");
+            const h6 = document.createElement("h3");
+            h6.textContent = `${character.name}`
+            liName.appendChild(h6);
+
+            ul.appendChild(liName);
+            const liLp = document.createElement("li");
+            liLp.textContent = `Points de vie : ${character.lp}`;
+            ul.appendChild(liLp);
+
+            const liMp = document.createElement("li");
+            liMp.textContent = `Points de magie : ${character.mp}`;
+            ul.appendChild(liMp);
+
+            const liAtk = document.createElement("li");
+            liAtk.textContent = `Attaque : ${character.atk}`;
+            ul.appendChild(liAtk);
+
+            const liDef = document.createElement("li");
+            liDef.textContent = `Défense : ${character.def}`;
+            ul.appendChild(liDef);
+
+            const liAtkm = document.createElement("li");
+            liAtkm.textContent = `Attaque magique : ${character.atkm}`;
+            ul.appendChild(liAtkm);
+
+            const liDefm = document.createElement("li");
+            liDefm.textContent = `Défense magique : ${character.defm}`;
+            ul.appendChild(liDefm);
+
+            const liSpeed = document.createElement("li");
+            liSpeed.textContent = `Vitesse : ${character.speed}`;
+            ul.appendChild(liSpeed);
+        });
+    } else {
+            const li = document.createElement("li");
+            li.textContent = `Aucun personnage enregistré.`
+            list.appendChild(li);
+    }
     });
-  } else {
-        const li = document.createElement("li");
-        li.textContent = `Aucun personnage enregistré.`
-        list.appendChild(li);
-  }
-});
 
-  </script>
-</body>
-</html>
+    </script>
+    </body>
+    </html>
